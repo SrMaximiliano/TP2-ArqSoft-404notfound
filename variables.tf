@@ -45,3 +45,11 @@ variable "os_version" {
 variable "machine_sku" {
   default = "Standard_F1als_v7"
 }
+
+variable "redis_sku" {
+  default = "Balanced_B0"
+}
+
+variable "redis_high_availability" {
+  default = false
+}

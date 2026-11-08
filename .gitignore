@@ -17,6 +17,7 @@ public_ip
 lb_dns
 jumpbox_dns
 redis_dns
+redis.json
 ddog_api_key
 vmss_hosts
 base_url
@@ -25,3 +26,7 @@ pubkey
 *.pem
 *.bak
 .vscode
+
+# Redis connection data (contains the access key)
+node/redis.json
+node/state/log.ndjson
