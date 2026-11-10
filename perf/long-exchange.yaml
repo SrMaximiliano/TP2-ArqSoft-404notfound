@@ -21,6 +21,25 @@ config:
         tags:
           - "test:long-exchange"
 
+before:
+  flow:
+    - put:
+        url: '/accounts/1/balance'
+        json:
+          balance: 120000000
+    - put:
+        url: '/accounts/2/balance'
+        json:
+          balance: 60000
+    - put:
+        url: '/accounts/3/balance'
+        json:
+          balance: 40000
+    - put:
+        url: '/accounts/4/balance'
+        json:
+          balance: 60000
+
 scenarios:
   - name: Exchange sostenido (misma cuenta interna)
     beforeScenario: "setDni"
