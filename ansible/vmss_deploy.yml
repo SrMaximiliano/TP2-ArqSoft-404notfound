@@ -2,8 +2,9 @@
   hosts: all
   gather_facts: yes
   tasks:
+    # delete (not just stop) so the new start picks up the node args and env vars below
     - name: Stop old version
-      command: pm2 stop app.js
+      command: pm2 delete app
       ignore_errors: yes
     - name: Extract new version
       unarchive:
@@ -13,5 +14,11 @@
         group: azureuser
     - name: Install dependencies
       command: npm install
+    # dd-trace must load before the app (ESM): it sends custom metrics, runtime metrics
+    # (event loop, GC, heap) and APM traces to the local Datadog agent.
     - name: Start new version
-      command: pm2 start app.js
+      command: pm2 start app.js --name app --node-args="--import dd-trace/initialize.mjs"
+      environment:
+        DD_SERVICE: arvault
+        DD_ENV: tp2
+        DD_RUNTIME_METRICS_ENABLED: "true"

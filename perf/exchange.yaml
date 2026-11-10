@@ -1,0 +1,32 @@
+config:
+  target: "{{ $processEnvironment.TARGET }}"
+  processor: "./functions.js"
+  http:
+    timeout: 30
+  pool: 50 # All HTTP requests from all virtual users will be sent over the same connections
+  phases:
+    - name: Carga sostenida sobre la misma cuenta interna
+      duration: 60
+      arrivalRate: 20
+  plugins:
+    publish-metrics:
+      - type: datadog
+        apiKey: "{{ $processEnvironment.DATADOG_API_KEY }}"
+        apiHost: "us5.datadoghq.com"
+        prefix: "artillery."
+        tags:
+          - "test:exchange"
+
+scenarios:
+  - name: Exchange sostenido (misma cuenta interna)
+    beforeScenario: "setDni"
+    flow:
+      - post:
+          url: '/exchange'
+          json:
+            baseCurrency: 'ARS'
+            counterCurrency: 'EUR'
+            baseAccountId: 2018
+            counterAccountId: 2011
+            baseAmount: 100
+            dni: "{{ dni }}"

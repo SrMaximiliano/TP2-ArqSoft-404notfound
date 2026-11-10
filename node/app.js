@@ -1,5 +1,6 @@
 import express from "express";
 import { isValidDni, MIN_DNI, MAX_DNI } from "./arca.js";
+import metrics from "./metrics.js";
 
 import {
   init as exchangeInit,
@@ -108,8 +109,23 @@ app.get("/log", async (req, res) => {
 
 // EXCHANGE endpoint
 
+// Server-side view of every /exchange response, per node (the agent adds the host tag):
+//   arvault.exchange.response  count,     tag status -> 200, 400, 403, 503, 500...
+//   arvault.exchange.duration  histogram, tag status -> ms inside arVault (ARCA + Redis + transfers)
+// Registered on "finish" so it also covers 400s and unexpected errors.
+const exchangeMetrics = (req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const tags = { status: String(res.statusCode) };
+    metrics.increment("arvault.exchange.response", 1, tags);
+    metrics.histogram("arvault.exchange.duration", Date.now() - start, tags);
+  });
+  next();
+};
+
 app.post(
   "/exchange",
+  exchangeMetrics,
   safe(async (req, res) => {
     const {
       baseCurrency,

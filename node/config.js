@@ -13,7 +13,7 @@ function loadRedisConfig() {
 
 export default {
   // Base uri for ARCA service
-  arcaUri: 'http://10.0.4.4:8080',
+  arcaUri: 'http://10.0.4.32:8080',
 
   redis: loadRedisConfig(),
 };
