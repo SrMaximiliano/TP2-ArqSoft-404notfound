@@ -1,0 +1,25 @@
+config:
+  target: "{{ $processEnvironment.TARGET }}"
+  pool: 50 # All HTTP requests from all virtual users will be sent over the same connections
+  phases:
+    - name: Ramp
+      duration: 120
+      arrivalRate: 1
+      rampTo: 15
+    - name: Plain
+      duration: 30
+      arrivalRate: 15
+  plugins:
+    publish-metrics:
+      - type: datadog
+        apiKey: "{{ $processEnvironment.DATADOG_API_KEY }}"
+        apiHost: "us5.datadoghq.com"
+        prefix: "artillery."
+        tags:
+          - "test:log"
+
+scenarios:
+  - name: Logs (/log)
+    flow:
+      - get:
+          url: '/log'

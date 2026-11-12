@@ -1,0 +1,7 @@
+# Ancho de banda (speed.cloudflare.com) - 2026-11-09T14:32:04-03:00
+upload 11541917 B/s
+upload 10606181 B/s
+upload 11098902 B/s
+download 11429642 B/s
+download 11458912 B/s
+download 11452717 B/s

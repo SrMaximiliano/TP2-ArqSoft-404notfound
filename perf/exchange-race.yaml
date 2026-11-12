@@ -1,0 +1,49 @@
+config:
+  target: "{{ $processEnvironment.TARGET }}"
+  processor: "./functions.js"
+  pool: 50 # All HTTP requests from all virtual users will be sent over the same connections
+  phases:
+    - name: 50 request en el mismo segundo
+      duration: 1
+      arrivalRate: 50
+  plugins:
+    publish-metrics:
+      - type: datadog
+        apiKey: "{{ $processEnvironment.DATADOG_API_KEY }}"
+        apiHost: "us5.datadoghq.com"
+        prefix: "artillery."
+        tags:
+          - "test:exchange-race"
+
+before:
+  flow:
+    - put:
+        url: '/accounts/1/balance'
+        json:
+          balance: 120000000
+    - put:
+        url: '/accounts/2/balance'
+        json:
+          balance: 60000
+    - put:
+        url: '/accounts/3/balance'
+        json:
+          balance: 40000
+    - put:
+        url: '/accounts/4/balance'
+        json:
+          balance: 60000
+
+scenarios:
+  - name: Exchange race condition (same internal counter account)
+    beforeScenario: "setDni"
+    flow:
+      - post:
+          url: '/exchange'
+          json:
+            baseCurrency: 'ARS'
+            counterCurrency: 'EUR'
+            baseAccountId: 2003
+            counterAccountId: 2001
+            baseAmount: 10000000
+            dni: "{{ dni }}"

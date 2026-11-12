@@ -1,0 +1,23 @@
+config:
+  target: "{{ $processEnvironment.TARGET }}"
+  pool: 50
+  http:
+    timeout: 5
+  phases:
+    - name: Constante
+      duration: 90
+      arrivalRate: 10
+  plugins:
+    publish-metrics:
+      - type: datadog
+        apiKey: "{{ $processEnvironment.DATADOG_API_KEY }}"
+        apiHost: "us5.datadoghq.com"
+        prefix: "artillery."
+        tags:
+          - "test:disponibilidad"
+
+scenarios:
+  - name: Rates (disponibilidad)
+    flow:
+      - get:
+          url: '/rates'
