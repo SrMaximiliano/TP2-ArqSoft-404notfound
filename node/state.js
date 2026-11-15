@@ -207,7 +207,7 @@ async function scheduleLogSave(period){
       if (entries && entries.length > 0){
         await saveLog(entries)
       }
-      await client.lTrim(LOG_KEY, entries.length, -1)
+      
     } catch (err){
       console.error('Error al persistir logs en disco:', err);
       throw new Error(err)
