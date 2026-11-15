@@ -1,5 +1,0 @@
-  "city": "Olivos",
-  "region": "Buenos Aires",
-  "country": "AR",
-  "org": "AS7303 Telecom Argentina S.A.",
-  "timezone": "America/Argentina/Buenos_Aires",
