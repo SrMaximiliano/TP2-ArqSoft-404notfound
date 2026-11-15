@@ -23,6 +23,7 @@ vmss_hosts
 base_url
 src.zip
 pubkey
+variables.tf
 *.pem
 *.bak
 .vscode
@@ -30,3 +31,6 @@ pubkey
 # Redis connection data (contains the access key)
 node/redis.json
 node/state/log.ndjson
+
+# Ansible files
+ansible/storage_vars.yml

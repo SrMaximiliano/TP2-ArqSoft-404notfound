@@ -6,14 +6,24 @@
     - name: Stop old version
       command: pm2 delete app
       ignore_errors: yes
+
     - name: Extract new version
       unarchive:
         src: ../node/src.zip
         dest: ~/.
         owner: azureuser
         group: azureuser
+
+    - name: Create symbolic link in ~/state/log.ndjson to Azure Files
+      file:
+        src: /mnt/azure_state/log.ndjson
+        dest: /home/azureuser/state/log.ndjson
+        state: link
+        force: yes
+
     - name: Install dependencies
       command: npm install
+
     # dd-trace must load before the app (ESM): it sends custom metrics, runtime metrics
     # (event loop, GC, heap) and APM traces to the local Datadog agent.
     - name: Start new version

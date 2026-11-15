@@ -4,17 +4,21 @@
   vars:
     datadog_api_key: "{{ lookup('file', './ddog_api_key') }}"
     datadog_site: "us5.datadoghq.com"
+  vars_files:
+    - ./storage_vars.yml
 
   tasks:
     - name: Import Datadog Agent role from collection
       import_role:
         name: datadog.dd.agent
       become: yes
+
     - name: Install unzip
       apt:
         name: unzip
         state: present
       become: yes
+
     - name: Install node
       shell: |
         sudo apt-get update
@@ -28,7 +32,56 @@
       args:
         creates: /usr/bin/node
       become: yes
+
     - name: Install pm2
       command: npm install pm2@latest -g
       become: yes
-      
+
+    - name: Install cifs-utils to mount Azure Files
+      become: true
+      apt:
+        name: cifs-utils
+        state: present
+        update_cache: yes
+
+    - name: Create protected directory for Server Message Block credentials
+      become: true
+      file:
+        path: /etc/smbcredentials
+        state: directory
+        mode: '0700'
+
+    - name: Save Storage Account credentials
+      become: true
+      copy:
+        dest: "/etc/smbcredentials/{{ storage_account_name }}.cred"
+        mode: '0600'
+        content: |
+          username={{ storage_account_name }}
+          password={{ storage_account_key }}
+
+    - name: make mount point /mnt/azure_state
+      become: true
+      file:
+        path: /mnt/azure_state
+        state: directory
+        mode: '0755'
+
+    - name: Mount Azure File Share and register it in /etc/fstab
+      become: true
+      ansible.posix.mount:
+        path: /mnt/azure_state
+        src: "//{{ storage_account_name }}.file.core.windows.net/{{ storage_share_name }}"
+        fstype: cifs
+        opts: "nofail,credentials=/etc/smbcredentials/{{ storage_account_name }}.cred,serverino,nosharesock,actimeo=30,mfsymlinks,uid=1000,gid=1000"
+        state: mounted
+
+    - name: Make empty log.ndjson file in Azure Files if it does not exist.
+      become: true
+      file:
+        path: /mnt/azure_state/log.ndjson
+        state: touch
+        modification_time: preserve
+        access_time: preserve
+        owner: azureuser
+        group: azureuser

@@ -184,11 +184,29 @@ export async function saveLog(log){
   await fs.promises.appendFile(filePath, logString);
 }
 
+//Se setea la clave/lock "lock:log_writer" en 1 solo si no existe.
+// Si ya existe la clave, no se setea nuevamente en 1 y no se obtiene nada en acquired. Entonces, la funcion retorna, al otro equipo tener el lock.
 async function scheduleLogSave(period){
   setInterval(async () => {
     try{
-      const entries = await client.lRange(LOG_KEY, 0, -1)
-      await saveLog(entries)
+      const acquired = await client.set("lock:log_writer", "1", {
+        NX:true,
+        PX: period -100 //Provoca que el lock se libere cada 900ns a period ser 1sg.
+      });
+      
+      if (!acquired){
+        return
+      }
+
+      const len = await client.lLen(LOG_KEY)
+      if (len === 0){
+        return;
+      }
+
+      const entries = await client.lPopCount(LOG_KEY, len)
+      if (entries && entries.length > 0){
+        await saveLog(entries)
+      }
       await client.lTrim(LOG_KEY, entries.length, -1)
     } catch (err){
       console.error('Error al persistir logs en disco:', err);
