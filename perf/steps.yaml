@@ -1,0 +1,80 @@
+config:
+  target: "{{ $processEnvironment.TARGET }}"
+  processor: "./functions.js"
+
+  http:
+    pool: 1000
+
+  phases:
+    - name: Warm up
+      duration: 15
+      arrivalRate: 5
+    - name: Subida a  50
+      duration: 60
+      arrivalRate: 50
+    - name: Subida a 75 
+      duration: 60
+      arrivalRate: 75
+    - name: Subida a 100 
+      duration: 60
+      arrivalRate: 100
+    - name: Subida a 200
+      duration: 60
+      arrivalRate: 200
+    - name: Subida a 250 
+      duration: 60
+      arrivalRate: 250
+    - name: Subida a 300 
+      duration: 60
+      arrivalRate: 300
+    - name: Subida a 400
+      duration: 60
+      arrivalRate: 400
+    - name: Subida a 450
+      duration: 60
+      arrivalRate: 450
+    - name: Subida a 500
+      duration: 60
+      arrivalRate: 500
+
+  plugins:
+    publish-metrics:
+      - type: datadog
+        apiKey: "{{ $processEnvironment.DATADOG_API_KEY }}"
+        apiHost: "us5.datadoghq.com"
+        prefix: "artillery."
+        tags:
+          - "test:exchange-step"
+
+before:
+  flow:
+    - put:
+        url: '/accounts/1/balance'
+        json:
+          balance: 120000000000
+    - put:
+        url: '/accounts/2/balance'
+        json:
+          balance: 60000
+    - put:
+        url: '/accounts/3/balance'
+        json:
+          balance: 40000
+    - put:
+        url: '/accounts/4/balance'
+        json:
+          balance: 60000
+
+scenarios:
+  - name: Exchange stress 
+    beforeScenario: "setDni"
+    flow:
+      - post:
+          url: '/exchange'
+          json:
+            baseCurrency: 'ARS'
+            counterCurrency: 'EUR'
+            baseAccountId: 2018
+            counterAccountId: 2011
+            baseAmount: 1
+            dni: "{{ dni }}"
