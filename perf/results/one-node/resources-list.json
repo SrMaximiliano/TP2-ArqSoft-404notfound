@@ -1,0 +1,62 @@
+[
+  {
+    "nombre": "tp2redis05ybgt4omhk9",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Cache/redisEnterprise"
+  },
+  {
+    "nombre": "tp2_network",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/virtualNetworks"
+  },
+  {
+    "nombre": "jumpbox_public_ip",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/publicIPAddresses"
+  },
+  {
+    "nombre": "lb_public_ip",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/publicIPAddresses"
+  },
+  {
+    "nombre": "vmss_http_sg",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/networkSecurityGroups"
+  },
+  {
+    "nombre": "ssh_sg",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/networkSecurityGroups"
+  },
+  {
+    "nombre": "tp2_lb",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/loadBalancers"
+  },
+  {
+    "nombre": "jumpbox_nic",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Network/networkInterfaces"
+  },
+  {
+    "nombre": "bfqmiogqxvvnzcsjbrxfkfnkc",
+    "region": "northcentralus",
+    "tipo": "Microsoft.ContainerInstance/containerGroups"
+  },
+  {
+    "nombre": "jumpbox",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Compute/virtualMachines"
+  },
+  {
+    "nombre": "jumpbox_OsDisk_1_981fdb013aec49e898673f5a0b6830d2",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Compute/disks"
+  },
+  {
+    "nombre": "tp2vmss",
+    "region": "northcentralus",
+    "tipo": "Microsoft.Compute/virtualMachineScaleSets"
+  }
+]
