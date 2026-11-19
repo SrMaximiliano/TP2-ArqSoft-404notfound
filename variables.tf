@@ -43,6 +43,10 @@ variable "os_version" {
 }
 
 variable "machine_sku" {
+  default = "Standard_B2as_v2"
+}
+
+variable "jumpbox_sku" {
   default = "Standard_B2ats_v2"
 }
 

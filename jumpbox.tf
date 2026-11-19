@@ -41,7 +41,7 @@ resource "azurerm_linux_virtual_machine" "jumpbox" {
   name                  = "jumpbox"
   resource_group_name   = azurerm_resource_group.tp2_resource_group.name
   location              = azurerm_resource_group.tp2_resource_group.location
-  size                  = var.machine_sku
+  size                  = var.jumbox_sku
   admin_username        = "azureuser"
   network_interface_ids = [azurerm_network_interface.jumpbox_nic.id]
 
