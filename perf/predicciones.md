@@ -34,3 +34,12 @@ Por otro lado, esperamos que la latencia cambie poco ya que analizando las métr
 - 503: p50 230 ms, p95 290 ms. -> Este es el que creemos que más va a aumentar ya que acumula las 3 requests fallidas.
 
 Como el límite que observamos fue el CPU de los nodos, esperamos que el sistema se sature un poco antes, aproximadamente alrededor de 300 req/s, en lugar de las ~450 req/s medidas sin reintentos ya que cada exchange hace en promedio ~1,31 llamadas a ARCA y más exchanges llegan a las transferencias (~64% contra ~49%)
+
+
+## Táctica escalamiento vertical + pm2 cluster
+
+Tomamos como base la prueba de 2 nodos con reintentos, que usa el mismo escenario que vamos a correr. En esa prueba el sistema respondió sin timeouts hasta 660 req/s, con una mediana de los 200 de 1250 ms y 1,6% de 503, y colapsó a partir de 740 req/s ofrecidas. En las pruebas anteriores observamos dos límites en cada nodo. Con 1 nodo, el proceso de node llegó al 100% de un core mientras la VM tenía capacidad libre, porque pm2 en modo fork usa un solo core de los dos. Con 2 nodos, el colapso coincidió con iowait de 80-90% y el event loop congelado, lo que indica que la VM se quedó sin memoria (1 GiB). Por eso creemos que los nodos están limitados tanto por la CPU de un solo core como por la memoria, y que no pudimos aprovechar el segundo core con pm2 en modo cluster justamente porque con 1 GiB no entran dos procesos de node junto con dd-trace y el agente de Datadog.
+
+La táctica combina dos tácticas de performance: incrementar recursos, cambiando los nodos de Standard_B2ats_v2 a Standard_B2as_v2 (2 vCPU dedicadas y 8 GiB de memoria), e introducir concurrencia, levantando 2 procesos de node por nodo con pm2 en modo cluster. 
+
+Creemos que se necesitan las dos VM con 2 procesos por nodo, cada nodo debería poder atender el doble, es decir unos 700-780 req/s por nodo y alrededor de 1400 req/s entre los dos en cuanto a CPU. Como el escenario llega hasta 900 req/s, predecimos que el sistema va a sostener todos los escalones sin colapsar y sin timeouts. La mediana de los 200 debería mantenerse entre 1150 y 1250 ms en todos los escalones, porque la define la espera (latencia de red hasta la nube, ARCA y las dos transferencias) y no la CPU, y los 503 deberían seguir en 1,6% gracias a los reintentos. A 900 req/s cada proceso atendería 225 req/s, así que esperamos que la CPU de cada proceso quede entre 55% y 65% y que la memoria de cada nodo no supere los 2 GiB de los 4 disponibles.
