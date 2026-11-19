@@ -1,0 +1,3 @@
+Standard_B2ats_v2 | Virtual Machines Basv2 Series | 0.0094 USD por 1 Hour
+Standard_B2ats_v2 | Basv2 Series Cloud Services | 0.0186 USD por 1 Hour
+Standard_F2als_v7 | Virtual Machines Falsv7 Series | 0.121 USD por 1 Hour
