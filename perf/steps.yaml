@@ -1,17 +1,42 @@
 config:
   target: "{{ $processEnvironment.TARGET }}"
   processor: "./functions.js"
+
   http:
-    timeout: 30
-  pool: 50 # All HTTP requests from all virtual users will be sent over the same connections
+    pool: 1000
+
   phases:
-    - name: Ramp
+    - name: Warm up
+      duration: 15
+      arrivalRate: 5
+    - name: Subida a  50
+      duration: 60
+      arrivalRate: 50
+    - name: Subida a 75 
+      duration: 60
+      arrivalRate: 75
+    - name: Subida a 100 
       duration: 60
       arrivalRate: 100
-      rampTo: 300
-    - name: Plain
-      duration: 660
+    - name: Subida a 200
+      duration: 60
+      arrivalRate: 200
+    - name: Subida a 250 
+      duration: 60
+      arrivalRate: 250
+    - name: Subida a 300 
+      duration: 60
       arrivalRate: 300
+    - name: Subida a 400
+      duration: 60
+      arrivalRate: 400
+    - name: Subida a 450
+      duration: 60
+      arrivalRate: 450
+    - name: Subida a 500
+      duration: 60
+      arrivalRate: 500
+
   plugins:
     publish-metrics:
       - type: datadog
@@ -19,14 +44,14 @@ config:
         apiHost: "us5.datadoghq.com"
         prefix: "artillery."
         tags:
-          - "test:long-exchange"
+          - "test:exchange-step"
 
 before:
   flow:
     - put:
         url: '/accounts/1/balance'
         json:
-          balance: 120000000
+          balance: 120000000000
     - put:
         url: '/accounts/2/balance'
         json:
@@ -41,7 +66,7 @@ before:
           balance: 60000
 
 scenarios:
-  - name: Exchange sostenido (misma cuenta interna)
+  - name: Exchange stress 
     beforeScenario: "setDni"
     flow:
       - post:
@@ -51,5 +76,5 @@ scenarios:
             counterCurrency: 'EUR'
             baseAccountId: 2018
             counterAccountId: 2011
-            baseAmount: 10
+            baseAmount: 1
             dni: "{{ dni }}"

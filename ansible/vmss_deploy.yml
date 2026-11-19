@@ -27,7 +27,7 @@
     # dd-trace must load before the app (ESM): it sends custom metrics, runtime metrics
     # (event loop, GC, heap) and APM traces to the local Datadog agent.
     - name: Start new version
-      command: pm2 start app.js --name app --node-args="--import dd-trace/initialize.mjs"
+      command: pm2 start app.js --name app -i 2 --node-args="--import dd-trace/initialize.mjs"
       environment:
         DD_SERVICE: arvault
         DD_ENV: tp2

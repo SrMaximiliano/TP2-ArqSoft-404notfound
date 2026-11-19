@@ -15,7 +15,7 @@ variable "dockerhub_token" {
 }
 
 variable "region" {
-  default = "eastus2"
+  default = "northcentralus"
 }
 
 variable "ssh_key_group_name" {
@@ -43,7 +43,11 @@ variable "os_version" {
 }
 
 variable "machine_sku" {
-  default = "Standard_F1als_v7"
+  default = "Standard_B2as_v2"
+}
+
+variable "jumpbox_sku" {
+  default = "Standard_B2ats_v2"
 }
 
 variable "redis_sku" {
